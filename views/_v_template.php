@@ -18,8 +18,11 @@
 		
 		<!-- Menu for users who are logged in -->
 		<?php if ($user): ?>
-			<a href='/users/logout'>Logout</a>
+			<a href='/posts/add'>Add Post</a>
+			<a href='/posts/index'>List Posts</a>
+			<a href='/posts/users'>Follow Users</a>
 			<a href='/users/profile'>Profile</a>
+			<a href='/users/logout'>Logout</a>
 		
 		<?php else: ?>
 			<a href='/users/signup'>Sign up</a>
