@@ -1,4 +1,5 @@
 <?php
+
 ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 
@@ -14,7 +15,6 @@ class users_controller extends base_controller {
     }
 
     public function signup() {
-
         # Setup view
 		$this->template->content = View::instance('v_users_signup');
 		$this->template->title   = "Sign Up";
@@ -25,7 +25,6 @@ class users_controller extends base_controller {
     }
 
     public function p_signup() {
-
 		# Dump out the results of POST to see what the form submitted
 		//print_r($_POST);
 		
@@ -89,10 +88,13 @@ class users_controller extends base_controller {
     		# Send them to the main page - or whereever
     		Router::redirect("/");
     	}
-    	    	
 	}
 
     public function logout() {
+    	# If user is blank, they're not logged in; redirect them to the Login page
+    	if (!$this->user)
+    		Router::redirect('/users/login');
+
         # Generate and save a new token for next login
         $new_token = sha1(TOKEN_SALT.$this->user->email.Utils::generate_random_string());
         
@@ -103,7 +105,7 @@ class users_controller extends base_controller {
         # Do the update
         DB::instance(DB_NAME)->update("users", $data, "WHERE token = '".$this->user->token."'");
         
-        # Delete their token cookie by setting it to a date in teh past - effectively logging them out
+        # Delete their token cookie by setting it to a date in the past - effectively logging them out
         setcookie("token", "", strtotime('-1 year'), '/');
         
         # Send them back to the main index.
@@ -111,11 +113,9 @@ class users_controller extends base_controller {
     }
 
     public function profile($user_name = NULL) { 
-    
     	# If user is blank, they're not logged in; redirect them to the Login page
-    	if (!$this->user) {
+    	if (!$this->user)
     		Router::redirect('/users/login');
-    	}
     	
     	# If they weren't redirected away, continue ...
 
