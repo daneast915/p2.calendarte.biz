@@ -1,9 +1,13 @@
-<form method='POST' action='/posts/p_add'>
+<h2>New Post</h2>
 
-	<label for='content'>New Post:</label><br/>
+<section id="new-post">
+
+<form method='POST' action='/posts/p_add' class="new-post-form">
+
 	<textarea name='content' id='content'></textarea>
-	
-	<br/><br/>
-	<input type='submit' value='New post'></input>
+    <br/>
+	<input type='submit' value='Post' class='button'></input>
 	
 </form>
+
+</section>

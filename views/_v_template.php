@@ -11,26 +11,33 @@
 </head>
 
 <body>	
+	<header>
+    	<h1><?=APP_NAME?></h1>
+	</header>
 
-	<div id='menu'>
+    <?php if ($user): ?>
+    
+    <!-- Menu for users who are logged in -->
+	<nav class='site_navigation'>
+        
+        <ul class='user_links'>
+			<li class='user_name'><?=$user->first_name?></li>
+            <li><a href='/users/profile'>Profile</a></li>
+            <li><a href='/users/logout'>Logout</a></li>
+    	</ul>
+
+    	<ul>
+			<li><a href='/'>Home</a></li>
+		
+            <li><a href='/posts/add'>Add Post</a></li>
+            <li><a href='/posts/index'>List Posts</a></li>
+            <li><a href='/posts/users'>Follow Users</a></li>
+        </ul>
+        
+        <hr class="clearme"/>
 	
-		<a href='/'>Home</a>
-		
-		<!-- Menu for users who are logged in -->
-		<?php if ($user): ?>
-			<a href='/posts/add'>Add Post</a>
-			<a href='/posts/index'>List Posts</a>
-			<a href='/posts/users'>Follow Users</a>
-			<a href='/users/profile'>Profile</a>
-			<a href='/users/logout'>Logout</a>
-		
-		<?php else: ?>
-			<a href='/users/signup'>Sign up</a>
-			<a href='/users/login'>Log in</a>
-			
-		<?php endif; ?>
-		
-	</div>
+	</nav>
+    <?php endif; ?>
 	
 	<br/>
 

@@ -1,14 +1,22 @@
+<h2>Posts</h2>
+
+<section id="posts_list">
+
 <?php foreach ($posts as $post): ?>
 
 <article>
-	<h2><?=$post['first_name']?> <?=$post['last_name']?> posted:</h2>
+	<h3><?=$post['first_name']?> <?=$post['last_name']?></h3>
 	
-	<p><?=$post['content']?></p>
+    <div class="date_time">
+		<time datetime="<?=Time::display($post['created'],'Y-m-d G:i')?>">
+			<?=Time::display($post['created'])?>
+		</time>
+    </div>
 	
-	<time datetime="<?=Time::display($post['created'],'Y-m-d G:i')?>">
-		<?=Time::display($post['created'])?>
-	</time>
+	<p class="post_text"><?=$post['content']?></p>
 	
 </article>
 
 <?php endforeach; ?>
+
+</section>

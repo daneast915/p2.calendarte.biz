@@ -4,6 +4,8 @@ ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 
 class users_controller extends base_controller {
+	
+	private $message;
 
     public function __construct() {
         parent::__construct();
@@ -11,22 +13,38 @@ class users_controller extends base_controller {
     } 
 
     public function index() {
-        echo "This is the index page";
-    }
+    	# If user is blank, they're not logged in; redirect them to the Login page
+    	if (!$this->user)
+    		Router::redirect('/users/login');
+		else
+    		Router::redirect("/posts/index");	
+	}
 
-    public function signup() {
+    public function signup($error = NULL) {
+		unset($this->message);
+		
         # Setup view
 		$this->template->content = View::instance('v_users_signup');
 		$this->template->title   = "Sign Up";
+		
+		# Pass data to the view
+		$this->template->content->error = $error;		
 
         # Render template
         echo $this->template;
-
     }
 
     public function p_signup() {
-		# Dump out the results of POST to see what the form submitted
-		//print_r($_POST);
+	    $q = "SELECT token 
+    		  FROM users 
+    		  WHERE email = '".$_POST['email']."'"; 
+    	
+    	$token = DB::instance(DB_NAME)->select_field($q);
+		
+		if ($token) {
+    		# Send them back to the login page
+    		Router::redirect("/users/signup/error");
+		}
 		
 		# More data we want stored with the user
 		$_POST['created']  = Time::now();
@@ -45,16 +63,24 @@ class users_controller extends base_controller {
 		# You should eventually make a proper View for this
 		//echo "You're signed up";       
 		
+		$this->message = "You're signed up. Please log in to verify.";
+		
 		Router::redirect('/users/login'); 
     }
 
     public function login($error = NULL) {
+    	if ($this->user)
+			Router::redirect('/posts/index'); 
+	
         # Setup view
 		$this->template->content = View::instance('v_users_login');
 		$this->template->title   = "Log In";
 		
 		# Pass data to the view
 		$this->template->content->error = $error;
+		$this->template->content->message = $this->message;
+		
+		unset($this->message);
 
         # Render template
         echo $this->template;
@@ -86,7 +112,7 @@ class users_controller extends base_controller {
     		setcookie ("token", $token, strtotime('+2 weeks'), '/');
     		
     		# Send them to the main page - or whereever
-    		Router::redirect("/");
+    		Router::redirect("/posts/index");
     	}
 	}
 
@@ -127,13 +153,25 @@ class users_controller extends base_controller {
 		$this->template->content = $content;
 		$this->template->title = 'Profile';
 		
-		//$client_files_head = Array(
-		//	'/css/profile.css',
-		//	'/css/master.css');
-		//$this->template->client_files_head = Utils::load_client_files($client_files_head);
-		
-		//$this->template->client_files_body = '';
-		
+		echo $this->template;
+    }
+
+    public function profileedit() { 
+    	# If user is blank, they're not logged in; redirect them to the Login page
+    	if (!$this->user)
+    		Router::redirect('/users/login');
+    	
+    	# If they weren't redirected away, continue ...
+
+		# Setup view
+		$content = View::instance('v_users_profileedit');
+		$content->first_name = $this->user->first_name;
+		$content->last_name = $this->user->last_name;
+
+		//echo $content;
+		$this->template->content = $content;
+		$this->template->title = 'Edit Profile';
+	
 		echo $this->template;
     }
 

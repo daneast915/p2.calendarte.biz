@@ -9,6 +9,9 @@ class posts_controller extends base_controller {
 		parent::__construct();
 
 		# careful with echos here!
+
+    	if (!$this->user)
+    		Router::redirect('/users/login');
 	}
 	
 	public function index() {
@@ -29,10 +32,16 @@ class posts_controller extends base_controller {
 				ON posts.user_id = users_users.user_id_followed
 			INNER JOIN users
 				ON posts.user_id = users.user_id
-			WHERE users_users.user_id = ".$this->user->user_id;
+			WHERE users_users.user_id = ".$this->user->user_id."
+			ORDER BY posts.created DESC";
 				
 		# Run the query
 		$posts = DB::instance(DB_NAME)->select_rows($q);
+		
+		if (count($posts) == 0) {
+			# Let them follow some users
+			Router::redirect("/posts/users");
+		}
 		
 		# Pass data to the View
 		$this->template->content->posts = $posts;
@@ -63,7 +72,7 @@ class posts_controller extends base_controller {
 		DB::instance(DB_NAME)->insert('posts', $_POST);
 		
 		# Feedback
-		echo "Your post has been added. <a href='/posts/add'>Add another</a>";
+		Router::redirect("/posts/index");
 	}
 
 	public function users() {
@@ -73,7 +82,8 @@ class posts_controller extends base_controller {
 		
 		# Build the query to get all the users
 		$q = "SELECT *
-			  FROM users";
+			  FROM users
+			  ORDER BY last_name, first_name";
 			  
 		# Execute the query to get all the users.
 		# Store the result array in the variable $users

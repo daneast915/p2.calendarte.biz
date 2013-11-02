@@ -1,14 +1,8 @@
-<h2>Log In</h2>
+<h2>Log in to <?=APP_NAME?></h2>
+
+<section id="users_login">
 
 <form method='POST' action='/users/p_login'>
-
-    Email<br/>
-    <input type='text' name='email'>
-    <br/><br/>
-
-    Password<br/>
-    <input type='password' name='password'/>
-    <br/><br/>
     
     <?php if (isset($error)): ?>
     	<div class='error'>
@@ -16,7 +10,29 @@
     	</div>
     	<br/>
     <?php endif; ?>
+    
+    <?php if (isset($message)): ?>
+    	<div class='message'>
+    		<?=$message?>
+    	</div>
+    	<br/>
+    <?php endif; ?>
 
-    <input type='submit' value='Log In'/>
+    <label for='email'>Email Address</label>
+    <input type='text' name='email' id='email' class='textbox'>
+    <br/><br/>
+
+    <label for='password'>Password</label>
+    <input type='password' name='password' id='password' class='textbox'/>
+    <br/><br/>
+
+    <input type='submit' value='Log In' class='button'/>
 
 </form>
+
+<p class='alternative'>
+<a href="/users/signup">Not a user yet?  Sign up!</a>
+</p>
+
+</section>
+

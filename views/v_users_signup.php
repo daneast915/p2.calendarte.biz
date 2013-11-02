@@ -1,23 +1,38 @@
-<h2>Sign Up</h2>
+<h2>Sign Up for <?=APP_NAME?></h2>
+
+<section id="users_signup">
 
 <form method='POST' action='/users/p_signup'>
-
-    First Name<br>
-    <input type='text' name='first_name'>
+    
+    <?php if (isset($error)): ?>
+    	<div class='error'>
+    		Email already used. Please use another.
+    	</div>
+    	<br/>
+    <?php endif; ?>
+    
+    <label for='first_name'>First Name</label>
+    <input type='text' name='first_name' id='first_name' class='textbox'>
     <br><br>
 
-    Last Name<br>
-    <input type='text' name='last_name'>
+    <label for='last_name'>Last Name</label>
+    <input type='text' name='last_name' id='last_name' class='textbox'>
     <br><br>
 
-    Email<br>
-    <input type='text' name='email'>
+    <label for='email'>Email</label>
+    <input type='text' name='email' id='email' class='textbox'>
     <br><br>
 
-    Password<br>
-    <input type='password' name='password'>
+    <label for='password'>Password</label>
+    <input type='password' name='password' id='password' class='textbox'>
     <br><br>
 
-    <input type='submit' value='Sign Up'>
+    <input type='submit' value='Sign Up' class='button'>
 
 </form>
+
+<p class='alternative'>
+<a href="/users/login">Already a user?  Log in!</a>
+</p>
+
+</section>

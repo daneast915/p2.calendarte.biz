@@ -24,7 +24,13 @@ class base_controller {
 								
 		# So we can use $user in views			
 			$this->template->set_global('user', $this->user);
-			
+		
+		# Setup CSS
+			$client_files_head = Array(
+				'/css/master.css'
+				);
+			$this->template->client_files_head = Utils::load_client_files($client_files_head);
+	
 	}
 	
 } # eoc
