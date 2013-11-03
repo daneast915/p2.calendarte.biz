@@ -2,11 +2,11 @@
 
 <section id="users_login">
 
-<form method='POST' action='/users/p_login'>
+<form method='POST' action='/users/login'>
     
-    <?php if (isset($error)): ?>
+    <?php if (isset($error) && strlen($error) > 0): ?>
     	<div class='error'>
-    		Login failed. Invalid Email or Password.
+    		<?=$error?>
     	</div>
     	<br/>
     <?php endif; ?>

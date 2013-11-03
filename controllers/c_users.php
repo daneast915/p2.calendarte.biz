@@ -4,12 +4,12 @@ ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 
 class users_controller extends base_controller {
-	
-	private $message;
+
 
     public function __construct() {
         parent::__construct();
         //echo "users_controller construct called<br><br>";
+	
     } 
 
     public function index() {
@@ -19,33 +19,78 @@ class users_controller extends base_controller {
 		else
     		Router::redirect("/posts/index");	
 	}
-
-    public function signup($error = NULL) {
-		unset($this->message);
-		
-        # Setup view
-		$this->template->content = View::instance('v_users_signup');
-		$this->template->title   = "Sign Up";
-		
-		# Pass data to the view
-		$this->template->content->error = $error;		
-
-        # Render template
-        echo $this->template;
-    }
-
-    public function p_signup() {
+	
+	private function validateEmail($email) {
+		# Validate the email address
 	    $q = "SELECT token 
     		  FROM users 
-    		  WHERE email = '".$_POST['email']."'"; 
+    		  WHERE email = '".$email."'"; 
     	
     	$token = DB::instance(DB_NAME)->select_field($q);
 		
 		if ($token) {
-    		# Send them back to the login page
-    		Router::redirect("/users/signup/error");
+    		# Send back false for error
+			return false;
 		}
 		
+		return true;
+	}
+
+    public function signup() {
+
+        # Setup view
+		$this->template->content = View::instance('v_users_signup');;	
+		$this->template->title   = "Sign Up";
+
+        # Render template
+		if (!$_POST) {
+			$this->template->content->first_name = '';
+			$this->template->content->last_name = '';
+			$this->template->content->email = '';
+			$this->template->content->password = '';
+			
+        	echo $this->template;
+			return;
+    	}
+
+		# Innocent until proven guilty
+		$error = false;
+		$this->template->content->error = '';
+
+		# Transfer POST data to content in case of error
+		$this->template->content->first_name = $_POST['first_name'];
+		$this->template->content->last_name = $_POST['last_name'];
+		$this->template->content->email = $_POST['email'];
+		$this->template->content->password = $_POST['password'];
+		
+		# Loop through the POST data to validate
+		foreach($_POST as $field_name => $value) {
+			# If a field is blank, add a message
+			if ($value == "") {
+				$this->template->content->error .= '"'.$field_name.'" must contain a value.<br/>';
+				$error = true;
+			}
+		}
+			
+		# Validate the email address
+	    if (!$this->validateEmail($_POST['email'])) {
+    		# Send them back to the login page
+			$this->template->content->error .= "Email has already been used. Please use another.<br/>";
+			$this->template->content['email'] = '';
+			$error = true;
+		}
+
+		# If any errors, display the page with the errors
+		if ($error) {
+			$this->template->content->first_name = $_POST['first_name'];
+			$this->template->content->last_name = $_POST['last_name'];
+			$this->template->content->email = $_POST['email'];
+			$this->template->content->password = $_POST['email'];
+
+			echo $this->template;
+			return;
+		}
+	
 		# More data we want stored with the user
 		$_POST['created']  = Time::now();
 		$_POST['modified'] = Time::now();
@@ -59,16 +104,11 @@ class users_controller extends base_controller {
 		# Insert this user into the database
 		$user_id = DB::instance(DB_NAME)->insert('users', $_POST);
 
-		# For now, just confirm they've signed up - 
-		# You should eventually make a proper View for this
-		//echo "You're signed up";       
-		
-		$this->message = "You're signed up. Please log in to verify.";
-		
-		Router::redirect('/users/login'); 
+		# Send them to the login screen
+		Router::redirect('/users/login/1'); 
     }
 
-    public function login($error = NULL) {
+    public function login($parm = NULL) {
     	if ($this->user)
 			Router::redirect('/posts/index'); 
 	
@@ -76,23 +116,25 @@ class users_controller extends base_controller {
 		$this->template->content = View::instance('v_users_login');
 		$this->template->title   = "Log In";
 		
-		# Pass data to the view
-		$this->template->content->error = $error;
-		$this->template->content->message = $this->message;
-		
-		unset($this->message);
+		if (isset($parm)) {
+			switch ($parm) {
+				case 1:
+					$this->template->content->message = "Thanks for signing up. Please log in.<br/>";
+					break;
+				case 2:
+					$this->template->content->message = "You've logged out.<br/>";
+					break;
+			}
+		}
 
         # Render template
-        echo $this->template;
-    }
+		if (!$_POST) {
+			echo $this->template;
+			return;
+		}
 
-    public function p_login() {
     	# Encrypt the password  
 		$_POST['password'] = sha1(PASSWORD_SALT.$_POST['password']);
-		
-		//echo "<pre>";
-    	//print_r($_POST);
-    	//echo "</pre>";
     	
     	$q = "SELECT token 
     		  FROM users 
@@ -101,19 +143,19 @@ class users_controller extends base_controller {
     	
     	$token = DB::instance(DB_NAME)->select_field($q);
     	
-    	//echo "token='".$token."'";
-    	
     	if (!$token) {
     		# Send them back to the login page
-    		Router::redirect("/users/login/error");
-    	} else {
-    		# Store this token in a cookie using setcookie()
-    		# NOTE: No echo before this!
-    		setcookie ("token", $token, strtotime('+2 weeks'), '/');
-    		
-    		# Send them to the main page - or whereever
-    		Router::redirect("/posts/index");
-    	}
+			$this->template->content->error = "Login failed. Invalid Email or Password.<br/>";
+			echo $this->template;
+			return;
+    	} 
+		
+		# Store this token in a cookie using setcookie()
+		# NOTE: No echo before this!
+		setcookie ("token", $token, strtotime('+2 weeks'), '/');
+		
+		# Send them to the main page - or whereever
+		Router::redirect("/posts/index");
 	}
 
     public function logout() {
@@ -135,15 +177,13 @@ class users_controller extends base_controller {
         setcookie("token", "", strtotime('-1 year'), '/');
         
         # Send them back to the main index.
-        Router::redirect("/");
+        Router::redirect("/users/login/2");
     }
 
     public function profile($user_name = NULL) { 
     	# If user is blank, they're not logged in; redirect them to the Login page
     	if (!$this->user)
     		Router::redirect('/users/login');
-    	
-    	# If they weren't redirected away, continue ...
 
 		# Setup view
 		$content = View::instance('v_users_profile');
@@ -160,19 +200,59 @@ class users_controller extends base_controller {
     	# If user is blank, they're not logged in; redirect them to the Login page
     	if (!$this->user)
     		Router::redirect('/users/login');
-    	
-    	# If they weren't redirected away, continue ...
 
 		# Setup view
 		$content = View::instance('v_users_profileedit');
 		$content->first_name = $this->user->first_name;
 		$content->last_name = $this->user->last_name;
-
+		$content->email = $this->user->email;
+		
 		//echo $content;
 		$this->template->content = $content;
 		$this->template->title = 'Edit Profile';
 	
-		echo $this->template;
-    }
+		if (!$_POST) {
+			echo $this->template;
+			return;
+		}
+		
+		# Innocent until proven guilty
+		$error = false;
+		$this->template->content->error = '';
+		
+		# Loop through the POST data to validate
+		foreach($_POST as $field_name => $value) {
+			# If a field is blank, add a message
+			if ($value == "") {
+				$this->template->content->error .= '"'.$field_name.'" must contain a value.<br/>';
+				$error = true;
+			}
+		}
+
+		# If any errors, display the page with the errors
+		if ($error) {
+			echo $this->template;
+			return;
+		}
+
+		# Validate the email address
+	    if ($_POST['email'] != $this->user->email && !$this->validateEmail($_POST['email'])) {
+    		# Send them back to the login page
+			$this->template->content->error = "Email has already been used. Please use another.<br/>";
+        	echo $this->template;
+			return;
+		}		
+		
+		# Passed validation
+
+		# More data we want stored with the user
+		$_POST['modified'] = Time::now();
+		
+		# Do the update
+		DB::instance(DB_NAME)->update("users", $_POST, "WHERE token = '".$this->user->token."'");
+		   
+		# Send them back to the profile page.
+		Router::redirect("/users/profile");
+   	}
 
 } # end of the class

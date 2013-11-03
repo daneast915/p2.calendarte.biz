@@ -195,13 +195,13 @@ a:active {
 	border-radius: 5px;
 	border-width: 1px;
 	border-style: solid;
+	font-size: medium;
 }
 
 .new-post-form input {
 	border: 1px solid darkgray;
 	border-radius: 4px;
 	padding: .4em;
-	font-size: larger;
 	margin-top: .5em;
 }
 
@@ -225,9 +225,11 @@ a:active {
 	display: block;
 }
 
+#welcome,
 #users_login,
 #users_signup,
-#users_profile {
+#users_profile,
+#users_profileedit {
 	background-color: #F0F0F0;
 	border-color: #bbb;
 	border-radius: 5px;
@@ -267,7 +269,7 @@ label {
 	border-radius: 5px;
 	border-width: 1px;
 	border-style: solid;
-	font-size:medium;
+	font-size: medium;
 }
 
 .alternative {
@@ -278,4 +280,15 @@ label {
 .error {
 	color: Red;
 	font-weight: bold;
+}
+
+.message {
+	color: DarkBlue;
+	font-weight: bold;
+}
+
+#welcome .button {
+	color: White;
+	width: 10em;
+	height: 2em;
 }
