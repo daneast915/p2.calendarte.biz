@@ -42,6 +42,13 @@
 	<br/>
 
 	<?php if(isset($content)) echo $content; ?>
+	
+	<footer>
+		<hr/>
+		What's Up? -- Project 2, DWA15, Dan East
+		<br/>
+		Harvard University Extension School
+	</footer>
 
 	<?php if(isset($client_files_body)) echo $client_files_body; ?>
 </body>

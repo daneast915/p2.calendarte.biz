@@ -2,16 +2,19 @@
 
 <section id="welcome">
 
-	Start a conversation, explore your interests, and be in the know.
+	"What's Up?" is a micro-blog you can use to keep up with your friends and family.
+	Start a conversation and be in the know.
 	<br/><br/>
-	Not signed up yet?
-	<br/><br/>
-	<a href="/users/signup" id="signup" class="button">Register</a>
-	<br/><br/>
-	Already signed up?
-	<br/><br/>
-	<a href="/users/login" id="login" class="button">Log In</a>
-    
+	<label for='signup' id='signup-label'>Not signed up yet?</label>
+	<label for='login' id='login-label'>Already signed up?</label>
+    <hr class="clearme" />
+
+	<form method='GET' action='/users/signup' id='signup-link'>
+		<input type='submit' value='Register' class='button'/>
+	</form>
+	<form method='GET' action='/users/login' id='login-link'>
+		<input type='submit' value='Log In' class='button'/>
+	</form>
     <hr class="clearme" />
 
 </section>

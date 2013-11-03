@@ -14,27 +14,29 @@
     <label for='first_name'>First Name</label>
     <input type='text' name='first_name' id='first_name' class='textbox'
     		value='<?=$first_name?>' />
-    <br><br>
+    <br/><br/>
 
     <label for='last_name'>Last Name</label>
     <input type='text' name='last_name' id='last_name' class='textbox'
     		value='<?=$last_name?>' /> 
-    <br><br>
+    <br/><br/>
 
     <label for='email'>Email</label>
     <input type='text' name='email' id='email' class='textbox'
     		value='<?=$email?>' /> 
-    <br><br>
+    <br/><br/>
 
     <label for='password'>Password</label>
     <input type='password' name='password' id='password' class='textbox'
     		value='<?=$password?>' /> 
-    <br><br>
+    <br/><br/>
 
     <input type='submit' value='Sign Up' class='button'>
 
 </form>
 
+<br/><hr/>
+	
 <p class='alternative'>
 <a href="/users/login">Already a user?  Log in!</a>
 </p>

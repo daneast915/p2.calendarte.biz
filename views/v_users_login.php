@@ -29,6 +29,8 @@
     <input type='submit' value='Log In' class='button'/>
 
 </form>
+    
+<hr class='hr-alternative'/>
 
 <p class='alternative'>
 <a href="/users/signup">Not a user yet?  Sign up!</a>

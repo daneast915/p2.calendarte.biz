@@ -5,7 +5,11 @@ error_reporting(E_ALL);
 
 class posts_controller extends base_controller {
 
+	/*-------------------------------------------------------------------------------------------------
+	
+	-------------------------------------------------------------------------------------------------*/
 	public function __construct() {
+	
 		parent::__construct();
 
 		# careful with echos here!
@@ -14,13 +18,18 @@ class posts_controller extends base_controller {
     		Router::redirect('/users/login');
 	}
 	
+	/*-------------------------------------------------------------------------------------------------
+	
+	-------------------------------------------------------------------------------------------------*/
 	public function index() {
+	
 		# Setup the View
 		$this->template->content = View::instance('v_posts_index');
 		$this->template->title = "Posts";
 		
 		# Build the query
 		$q = "SELECT
+				posts.post_id,
 				posts.content,
 				posts.created,
 				posts.user_id AS post_user_id,
@@ -45,13 +54,18 @@ class posts_controller extends base_controller {
 		
 		# Pass data to the View
 		$this->template->content->posts = $posts;
+		$this->template->content->user_id = $this->user->user_id;
 		
 		# Render the View
 		echo $this->template;
 		
 	}
 
+	/*-------------------------------------------------------------------------------------------------
+	
+	-------------------------------------------------------------------------------------------------*/
 	public function add() {
+	
 		# Setup view
 		$this->template->content = View::instance('v_posts_add');
 		$this->template->title = "New Post";
@@ -60,7 +74,11 @@ class posts_controller extends base_controller {
 		echo $this->template;
 	}
 
+	/*-------------------------------------------------------------------------------------------------
+	
+	-------------------------------------------------------------------------------------------------*/
 	public function p_add() {
+	
 		# Associate this post with this user
 		$_POST['user_id'] = $this->user->user_id;
 		
@@ -74,8 +92,26 @@ class posts_controller extends base_controller {
 		# Feedback
 		Router::redirect("/posts/index");
 	}
-
+	
+	/*-------------------------------------------------------------------------------------------------
+	
+	-------------------------------------------------------------------------------------------------*/
+	public function delete() {
+	
+		# Delete this post
+		$post_id = $_POST['post_id'];
+		$where_condition = 'WHERE post_id = '.$post_id;
+		DB::instance(DB_NAME)->delete('posts', $where_condition);
+			
+		# Send them back
+		Router::redirect("/posts/index");	
+	}
+	
+	/*-------------------------------------------------------------------------------------------------
+	
+	-------------------------------------------------------------------------------------------------*/
 	public function users() {
+	
 		# Setup the View
 		$this->template->content = View::instance("v_posts_users");
 		$this->template->title = "Users";
@@ -83,6 +119,7 @@ class posts_controller extends base_controller {
 		# Build the query to get all the users
 		$q = "SELECT *
 			  FROM users
+			  WHERE user_id <> ".$this->user->user_id."
 			  ORDER BY last_name, first_name";
 			  
 		# Execute the query to get all the users.
@@ -109,8 +146,13 @@ class posts_controller extends base_controller {
 		echo $this->template;
 	}
 	
-	public function follow ($user_id_followed) {
+	/*-------------------------------------------------------------------------------------------------
+	
+	-------------------------------------------------------------------------------------------------*/
+	public function follow () {
+	
 		# Prepare the data array to be inserted
+		$user_id_followed = $_POST['user_id_followed'];
 		$data = Array(
 			"created" => Time::now(),
 			"user_id" => $this->user->user_id,
@@ -124,12 +166,18 @@ class posts_controller extends base_controller {
 		Router::redirect("/posts/users");
 	}
 	
-	public function unfollow($user_id_followed) {
+	/*-------------------------------------------------------------------------------------------------
+	
+	-------------------------------------------------------------------------------------------------*/
+	public function unfollow() {
+	
 		# Delete this connection
+		$user_id_followed = $_POST['user_id_followed'];
 		$where_condition = 'WHERE user_id = '.$this->user->user_id.' AND user_id_followed = '.$user_id_followed;
 		DB::instance(DB_NAME)->delete('users_users', $where_condition);
 			
 		# Send them back
 		Router::redirect("/posts/users");	
 	}
-}
+	
+} #eoc

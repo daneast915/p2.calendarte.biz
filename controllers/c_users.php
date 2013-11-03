@@ -6,13 +6,20 @@ error_reporting(E_ALL);
 class users_controller extends base_controller {
 
 
+	/*-------------------------------------------------------------------------------------------------
+	
+	-------------------------------------------------------------------------------------------------*/
     public function __construct() {
+    
         parent::__construct();
-        //echo "users_controller construct called<br><br>";
 	
     } 
 
+	/*-------------------------------------------------------------------------------------------------
+	
+	-------------------------------------------------------------------------------------------------*/
     public function index() {
+    
     	# If user is blank, they're not logged in; redirect them to the Login page
     	if (!$this->user)
     		Router::redirect('/users/login');
@@ -20,7 +27,11 @@ class users_controller extends base_controller {
     		Router::redirect("/posts/index");	
 	}
 	
+	/*-------------------------------------------------------------------------------------------------
+	
+	-------------------------------------------------------------------------------------------------*/
 	private function validateEmail($email) {
+	
 		# Validate the email address
 	    $q = "SELECT token 
     		  FROM users 
@@ -36,7 +47,10 @@ class users_controller extends base_controller {
 		return true;
 	}
 
-    public function signup() {
+ 	/*-------------------------------------------------------------------------------------------------
+	
+	-------------------------------------------------------------------------------------------------*/
+   public function signup() {
 
         # Setup view
 		$this->template->content = View::instance('v_users_signup');;	
@@ -56,12 +70,6 @@ class users_controller extends base_controller {
 		# Innocent until proven guilty
 		$error = false;
 		$this->template->content->error = '';
-
-		# Transfer POST data to content in case of error
-		$this->template->content->first_name = $_POST['first_name'];
-		$this->template->content->last_name = $_POST['last_name'];
-		$this->template->content->email = $_POST['email'];
-		$this->template->content->password = $_POST['password'];
 		
 		# Loop through the POST data to validate
 		foreach($_POST as $field_name => $value) {
@@ -76,7 +84,6 @@ class users_controller extends base_controller {
 	    if (!$this->validateEmail($_POST['email'])) {
     		# Send them back to the login page
 			$this->template->content->error .= "Email has already been used. Please use another.<br/>";
-			$this->template->content['email'] = '';
 			$error = true;
 		}
 
@@ -85,7 +92,7 @@ class users_controller extends base_controller {
 			$this->template->content->first_name = $_POST['first_name'];
 			$this->template->content->last_name = $_POST['last_name'];
 			$this->template->content->email = $_POST['email'];
-			$this->template->content->password = $_POST['email'];
+			$this->template->content->password = '';
 
 			echo $this->template;
 			return;
@@ -96,19 +103,31 @@ class users_controller extends base_controller {
 		$_POST['modified'] = Time::now();
 
 		# Encrypt the password  
-		$_POST['password'] = sha1(PASSWORD_SALT.$_POST['password']);            
+		$_POST['password'] = User::hash_password($_POST['password']);  
 
 		# Create an encrypted token via their email address and a random string
-		$_POST['token']    = sha1(TOKEN_SALT.$_POST['email'].Utils::generate_random_string()); 
+		$_POST['token']    = User::generate_token($_POST['email']); 
     
 		# Insert this user into the database
 		$user_id = DB::instance(DB_NAME)->insert('users', $_POST);
+		
+		# Follow the user's own posts
+		$data = Array(
+			"created" => Time::now(),
+			"user_id" => $user_id,
+			"user_id_followed" => $user_id
+			);
+		DB::instance(DB_NAME)->insert('users_users', $data);
 
 		# Send them to the login screen
 		Router::redirect('/users/login/1'); 
     }
 
+	/*-------------------------------------------------------------------------------------------------
+	
+	-------------------------------------------------------------------------------------------------*/
     public function login($parm = NULL) {
+    
     	if ($this->user)
 			Router::redirect('/posts/index'); 
 	
@@ -134,7 +153,7 @@ class users_controller extends base_controller {
 		}
 
     	# Encrypt the password  
-		$_POST['password'] = sha1(PASSWORD_SALT.$_POST['password']);
+		$_POST['password'] = User::hash_password($_POST['password']);
     	
     	$q = "SELECT token 
     		  FROM users 
@@ -158,13 +177,17 @@ class users_controller extends base_controller {
 		Router::redirect("/posts/index");
 	}
 
+	/*-------------------------------------------------------------------------------------------------
+	
+	-------------------------------------------------------------------------------------------------*/
     public function logout() {
+    
     	# If user is blank, they're not logged in; redirect them to the Login page
     	if (!$this->user)
     		Router::redirect('/users/login');
 
         # Generate and save a new token for next login
-        $new_token = sha1(TOKEN_SALT.$this->user->email.Utils::generate_random_string());
+        $new_token = User::generate_token($this->user->email);
         
         # Create the data array we'll use with the update method
         # In this case, we're only updating one field, so our array only has one entry
@@ -180,7 +203,11 @@ class users_controller extends base_controller {
         Router::redirect("/users/login/2");
     }
 
+	/*-------------------------------------------------------------------------------------------------
+	
+	-------------------------------------------------------------------------------------------------*/
     public function profile($user_name = NULL) { 
+    
     	# If user is blank, they're not logged in; redirect them to the Login page
     	if (!$this->user)
     		Router::redirect('/users/login');
@@ -196,7 +223,11 @@ class users_controller extends base_controller {
 		echo $this->template;
     }
 
+	/*-------------------------------------------------------------------------------------------------
+	
+	-------------------------------------------------------------------------------------------------*/
     public function profileedit() { 
+    
     	# If user is blank, they're not logged in; redirect them to the Login page
     	if (!$this->user)
     		Router::redirect('/users/login');

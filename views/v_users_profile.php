@@ -12,15 +12,17 @@
 
     <label for='first_name'>First Name</label>
     <div id='first_name'><?=$user->first_name?></div>
-    <br>
+    <br/>
 
     <label for='last_name'>Last Name</label>
     <div id='last_name'><?=$user->last_name?></div>
-    <br>
+    <br/>
 
     <label for='email'>Email</label>
     <div id='email'><?=$user->email?></div>
-    <br>
+    <br/>
+    
+    <hr/>
 
     <p class='alternative'>
     <a href="/users/profileedit">Edit Profile</a>

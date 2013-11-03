@@ -12,6 +12,13 @@ header {
 	text-align: center;
 }
 
+footer {
+	margin-top: 5em;
+	text-align: center;
+	color: gray;
+	font-size: small;
+}
+
 header img {
 	border-color: White;
 	border-style: solid;
@@ -196,6 +203,7 @@ a:active {
 	border-width: 1px;
 	border-style: solid;
 	font-size: medium;
+	font-family: Calibri, Arial, Helvetica, sans-serif;
 }
 
 .new-post-form input {
@@ -207,6 +215,11 @@ a:active {
 
 #users-list .follow-link {
 	float: right;
+}
+
+#users-list .followed-name, .notfollowed-name {
+	height: 1.5em;
+	vertical-align: middle;
 }
 
 #users-list .followed-name {
@@ -256,7 +269,7 @@ label {
 	color: White;
 	padding: .4em;
 	font-size: larger;
-	margin-top: .4em;
+	margin-top: .2em;
 }
 
 .textbox {
@@ -273,8 +286,12 @@ label {
 }
 
 .alternative {
-	padding-top: 1em;
+	margin-top: .7em;
 	font-style: italic;
+}
+
+.hr-alternative {
+	margin-top: 1em;
 }
 
 .error {
@@ -289,6 +306,21 @@ label {
 
 #welcome .button {
 	color: White;
-	width: 10em;
-	height: 2em;
+	width: 8em;
 }
+
+#welcome #signup-label, #signup-link {
+	float: right;
+}
+
+.delete-link {
+	float: right;
+}
+
+.listentry-button {
+	border: 1px solid black;
+	border-radius: 3px;
+	background-color: Gray;
+	color: White;
+	padding: .3em;
+} 
