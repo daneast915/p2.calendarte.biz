@@ -13,7 +13,7 @@ class base_controller {
 	public function __construct() {
 						
 		# Instantiate User obj
-			$this->userObj = new User();
+			$this->userObj = new WhatsUpUser();
 			
 		# Authenticate / load user
 			$this->user = $this->userObj->authenticate();					

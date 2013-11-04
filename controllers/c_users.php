@@ -7,7 +7,7 @@ class users_controller extends base_controller {
 
 
 	/*-------------------------------------------------------------------------------------------------
-	
+	Constructor
 	-------------------------------------------------------------------------------------------------*/
     public function __construct() {
     
@@ -16,7 +16,7 @@ class users_controller extends base_controller {
     } 
 
 	/*-------------------------------------------------------------------------------------------------
-	
+	users/index controller method
 	-------------------------------------------------------------------------------------------------*/
     public function index() {
     
@@ -26,29 +26,9 @@ class users_controller extends base_controller {
 		else
     		Router::redirect("/posts/index");	
 	}
-	
-	/*-------------------------------------------------------------------------------------------------
-	
-	-------------------------------------------------------------------------------------------------*/
-	private function validateEmail($email) {
-	
-		# Validate the email address
-	    $q = "SELECT token 
-    		  FROM users 
-    		  WHERE email = '".$email."'"; 
-    	
-    	$token = DB::instance(DB_NAME)->select_field($q);
-		
-		if ($token) {
-    		# Send back false for error
-			return false;
-		}
-		
-		return true;
-	}
 
  	/*-------------------------------------------------------------------------------------------------
-	
+	users/signup controller method
 	-------------------------------------------------------------------------------------------------*/
    public function signup() {
 
@@ -71,19 +51,41 @@ class users_controller extends base_controller {
 		$error = false;
 		$this->template->content->error = '';
 		
+		# Array for field names
+		$field_names = Array(
+			"first_name" => "First Name",
+			"last_name" => "Last Name",
+			"email" => "Email"
+			);
+		
 		# Loop through the POST data to validate
 		foreach($_POST as $field_name => $value) {
 			# If a field is blank, add a message
 			if ($value == "") {
-				$this->template->content->error .= '"'.$field_name.'" must contain a value.<br/>';
+				$this->template->content->error .= $field_names[$field_name].' must contain a value.<br/>';
 				$error = true;
 			}
-		}
 			
-		# Validate the email address
-	    if (!$this->validateEmail($_POST['email'])) {
-    		# Send them back to the login page
-			$this->template->content->error .= "Email has already been used. Please use another.<br/>";
+			# If a field contains invalid characters, add a message
+			if ($this->userObj->check_for_invalid_chars ($value))  {
+				$this->template->content->error .= $field_names[$field_name].' contains invalid characters.<br/>';
+				$_POST[$field_name] = '';
+				$error = true;				
+			}
+		}
+		
+		# Sanitize the data
+		$_POST['first_name'] = $this->userObj->sanitize_data ($_POST['first_name']);
+		$_POST['last_name'] = $this->userObj->sanitize_data ($_POST['last_name']);
+		$_POST['email'] = $this->userObj->sanitize_data ($_POST['email']);
+		
+		$email = $_POST['email'];
+		
+		# Validate the email address for format and uniqueness
+		$email_error = $this->userObj->validate_email ($email);
+		if (!empty($email_error)) {
+			$this->template->content->error .= $email_error;
+			$email = '';
 			$error = true;
 		}
 
@@ -91,7 +93,7 @@ class users_controller extends base_controller {
 		if ($error) {
 			$this->template->content->first_name = $_POST['first_name'];
 			$this->template->content->last_name = $_POST['last_name'];
-			$this->template->content->email = $_POST['email'];
+			$this->template->content->email = $email;
 			$this->template->content->password = '';
 
 			echo $this->template;
@@ -106,27 +108,19 @@ class users_controller extends base_controller {
 		$_POST['password'] = User::hash_password($_POST['password']);  
 
 		# Create an encrypted token via their email address and a random string
-		$_POST['token']    = User::generate_token($_POST['email']); 
+		$_POST['token']    = User::generate_token($email); 
     
 		# Insert this user into the database
-		$user_id = DB::instance(DB_NAME)->insert('users', $_POST);
-		
-		# Follow the user's own posts
-		$data = Array(
-			"created" => Time::now(),
-			"user_id" => $user_id,
-			"user_id_followed" => $user_id
-			);
-		DB::instance(DB_NAME)->insert('users_users', $data);
+		$this->userObj->add_new_user ($_POST);
 
 		# Send them to the login screen
 		Router::redirect('/users/login/1'); 
     }
 
 	/*-------------------------------------------------------------------------------------------------
-	
+	users/login controller method
 	-------------------------------------------------------------------------------------------------*/
-    public function login($parm = NULL) {
+    public function login($param = NULL) {
     
     	if ($this->user)
 			Router::redirect('/posts/index'); 
@@ -135,8 +129,8 @@ class users_controller extends base_controller {
 		$this->template->content = View::instance('v_users_login');
 		$this->template->title   = "Log In";
 		
-		if (isset($parm)) {
-			switch ($parm) {
+		if (isset($param)) {
+			switch ($param) {
 				case 1:
 					$this->template->content->message = "Thanks for signing up. Please log in.<br/>";
 					break;
@@ -152,15 +146,8 @@ class users_controller extends base_controller {
 			return;
 		}
 
-    	# Encrypt the password  
-		$_POST['password'] = User::hash_password($_POST['password']);
-    	
-    	$q = "SELECT token 
-    		  FROM users 
-    		  WHERE email = '".$_POST['email']."'
-    		  AND password = '".$_POST['password']."'"; 
-    	
-    	$token = DB::instance(DB_NAME)->select_field($q);
+		# Attempt to login
+		$token = $this->userObj->login ($_POST['email'], $_POST['password']);
     	
     	if (!$token) {
     		# Send them back to the login page
@@ -169,16 +156,12 @@ class users_controller extends base_controller {
 			return;
     	} 
 		
-		# Store this token in a cookie using setcookie()
-		# NOTE: No echo before this!
-		setcookie ("token", $token, strtotime('+2 weeks'), '/');
-		
 		# Send them to the main page - or whereever
 		Router::redirect("/posts/index");
 	}
 
 	/*-------------------------------------------------------------------------------------------------
-	
+	users/logout controller method
 	-------------------------------------------------------------------------------------------------*/
     public function logout() {
     
@@ -186,25 +169,15 @@ class users_controller extends base_controller {
     	if (!$this->user)
     		Router::redirect('/users/login');
 
-        # Generate and save a new token for next login
-        $new_token = User::generate_token($this->user->email);
-        
-        # Create the data array we'll use with the update method
-        # In this case, we're only updating one field, so our array only has one entry
-        $data = Array("token" => $new_token);
-        
-        # Do the update
-        DB::instance(DB_NAME)->update("users", $data, "WHERE token = '".$this->user->token."'");
-        
-        # Delete their token cookie by setting it to a date in the past - effectively logging them out
-        setcookie("token", "", strtotime('-1 year'), '/');
+		# Attempt to logout
+		$this->userObj->logout ($this->user->email);
         
         # Send them back to the main index.
         Router::redirect("/users/login/2");
     }
 
 	/*-------------------------------------------------------------------------------------------------
-	
+	users/profile controller method
 	-------------------------------------------------------------------------------------------------*/
     public function profile($user_name = NULL) { 
     
@@ -224,7 +197,7 @@ class users_controller extends base_controller {
     }
 
 	/*-------------------------------------------------------------------------------------------------
-	
+	users/profileedit controller method
 	-------------------------------------------------------------------------------------------------*/
     public function profileedit() { 
     
@@ -251,28 +224,61 @@ class users_controller extends base_controller {
 		$error = false;
 		$this->template->content->error = '';
 		
+		# Array for field names
+		$field_names = Array(
+			"first_name" => "First Name",
+			"last_name" => "Last Name",
+			"email" => "Email"
+			);
+					
 		# Loop through the POST data to validate
 		foreach($_POST as $field_name => $value) {
 			# If a field is blank, add a message
 			if ($value == "") {
-				$this->template->content->error .= '"'.$field_name.'" must contain a value.<br/>';
+				$this->template->content->error .= $field_names[$field_name].' must contain a value.<br/>';
+				$error = true;				
+			}
+			
+			if ($this->userObj->check_for_invalid_chars ($value))  {
+				$this->template->content->error .= $field_names[$field_name].' contains invalid characters.<br/>';
+				$_POST[$field_name] = '';
+				$error = true;				
+			}
+		}
+		
+		# Sanitize the fields
+		$_POST['first_name'] = $this->userObj->sanitize_data ($_POST['first_name']);
+		$_POST['last_name'] = $this->userObj->sanitize_data ($_POST['last_name']);
+		$_POST['email'] = $this->userObj->sanitize_data ($_POST['email']);
+		
+		$email = $_POST['email'];
+
+		# Validate the email address for format and uniqueness
+		$email_error = $this->userObj->validate_email ($email, FALSE);
+		if (!empty($email_error)) {
+			$this->template->content->error .= $email_error;
+			$email = '';
+			$error = true;
+		}
+		
+		if (!empty($email) && $email != $this->user->email) {
+			if (!$this->confirm_unique_email($email)) {
+				$this->template->content->error .=  "Email has already been used. Please use another.<br/>";
+				$email = '';
 				$error = true;
 			}
 		}
 
 		# If any errors, display the page with the errors
 		if ($error) {
+		echo print_r($_POST);
+			$this->template->content->first_name = $_POST['first_name'];
+			$this->template->content->last_name = $_POST['last_name'];
+			$this->template->content->email = $email;
+			
 			echo $this->template;
 			return;
 		}
-
-		# Validate the email address
-	    if ($_POST['email'] != $this->user->email && !$this->validateEmail($_POST['email'])) {
-    		# Send them back to the login page
-			$this->template->content->error = "Email has already been used. Please use another.<br/>";
-        	echo $this->template;
-			return;
-		}		
 		
 		# Passed validation
 
@@ -280,7 +286,7 @@ class users_controller extends base_controller {
 		$_POST['modified'] = Time::now();
 		
 		# Do the update
-		DB::instance(DB_NAME)->update("users", $_POST, "WHERE token = '".$this->user->token."'");
+		$this->userObj->update_profile ($this->user->token, $_POST);
 		   
 		# Send them back to the profile page.
 		Router::redirect("/users/profile");

@@ -12,13 +12,6 @@ header {
 	text-align: center;
 }
 
-footer {
-	margin-top: 5em;
-	text-align: center;
-	color: gray;
-	font-size: small;
-}
-
 header img {
 	border-color: White;
 	border-style: solid;
@@ -32,6 +25,22 @@ header h1 {
 	display: inline;
 	margin: 1em;
 	vertical-align: middle;
+}
+
+footer {
+	margin-top: 5em;
+	text-align: center;
+	color: gray;
+	font-size: small;
+}
+
+.hr-thin {
+	display: block; 
+	height: 1px;
+    border: 0; 
+    border-top: 1px solid #bbb;
+    margin: 1em 0; 
+    padding: 0;
 }
 
 .site_navigation {

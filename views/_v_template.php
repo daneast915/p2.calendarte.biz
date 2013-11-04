@@ -44,7 +44,7 @@
 	<?php if(isset($content)) echo $content; ?>
 	
 	<footer>
-		<hr/>
+		<hr class='hr-thin'/>
 		What's Up? -- Project 2, DWA15, Dan East
 		<br/>
 		Harvard University Extension School
