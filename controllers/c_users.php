@@ -55,7 +55,8 @@ class users_controller extends base_controller {
 		$field_names = Array(
 			"first_name" => "First Name",
 			"last_name" => "Last Name",
-			"email" => "Email"
+			"email" => "Email",
+			"password" => "Password"
 			);
 		
 		# Loop through the POST data to validate
