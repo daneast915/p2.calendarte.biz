@@ -54,19 +54,35 @@ class posts_controller extends base_controller {
 		$this->template->title = "New Post";
 		
 		# Render templates
-		echo $this->template;
-	}
-
-	/*-------------------------------------------------------------------------------------------------
-	
-	-------------------------------------------------------------------------------------------------*/
-	public function p_add() {
-	
-		if (!empty($_POST['content'])) {
-			# Add a post for this user
-			$_POST['content'] = $this->userObj->sanitize_data ($_POST['content']);
-			$this->userObj->add_post ($this->user->user_id, $_POST);
+		if (!$_POST) {
+			echo $this->template;
+			return;
 		}
+
+		# Innocent until proven guilty
+		$error = false;
+		$this->template->content->error = '';
+	
+		# Validate the post
+		if (empty($_POST['content'])) {
+			$this->template->content->error .= 'Post must not be empty.<br/>';
+			$error = true;
+		}
+
+		if ($this->userObj->check_for_invalid_chars ($_POST['content']))  {
+			$this->template->content->error .= 'Post contains invalid characters.<br/>';
+			$error = true;
+		}
+
+		# If any errors, display the page with the errors
+		if ($error) {
+			echo $this->template;
+			return;
+		}
+
+		# Add a post for this user
+		$_POST['content'] = $this->userObj->sanitize_data ($_POST['content']);
+		$this->userObj->add_post ($this->user->user_id, $_POST);
 		
 		# Feedback
 		Router::redirect("/posts/index");

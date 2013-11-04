@@ -196,9 +196,16 @@ class WhatsUpUser extends User {
 	Sanitize user data
 	-------------------------------------------------------------------------------------------------*/
 	public function sanitize_data ($data) {
-	
+	/*
+		echo "$data = '".$data."' <br>";
+		echo "nl2br = '".nl2br($data)."' <br>";
+		echo "stripslashes = '".stripslashes(nl2br($data))."' <br>";
+		echo "htmlentities = '".htmlentities(stripslashes(nl2br($data)),ENT_QUOTES,"Utf-8")."' <br>";
+		echo "DB sanitize = '".DB::instance(DB_NAME)->sanitize(
+					htmlentities(stripslashes(nl2br($data)),ENT_QUOTES,"Utf-8"))."' <br>";
+	*/
 		return DB::instance(DB_NAME)->sanitize(
-					htmlentities(stripslashes(nl2br($data)),ENT_NOQUOTES,"Utf-8"));
+					htmlentities(stripslashes(nl2br($data)),ENT_QUOTES,"Utf-8"));
 	}
 
 } #eof
