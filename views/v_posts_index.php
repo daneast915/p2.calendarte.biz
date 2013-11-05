@@ -26,6 +26,7 @@
 
 		<p class="post_text"><?=$post['content']?></p>
 	
+		<hr class="clearme"/>
 	</article>
 
 	<?php endforeach; ?>

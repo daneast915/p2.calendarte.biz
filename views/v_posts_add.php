@@ -1,4 +1,4 @@
-<h2>New Post</h2>
+<h2>Add a Post</h2>
 
 <section id="new-post">
 

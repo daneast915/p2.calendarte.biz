@@ -1,9 +1,14 @@
 <?php
 
+/*-------------------------------------------------------------------------------------------------
+ WhatsUpUser is an extension of the framework's User class.
+ It contains convenience methods for database access.
+-------------------------------------------------------------------------------------------------*/
 class WhatsUpUser extends User {
 
 	/*-------------------------------------------------------------------------------------------------
 	Update the profile of a user
+	@return DB update return
 	-------------------------------------------------------------------------------------------------*/
 	public function update_profile ($token, $data /* array */ ) {
 	
@@ -13,6 +18,7 @@ class WhatsUpUser extends User {
 	
 	/*-------------------------------------------------------------------------------------------------
 	Insert a new user into the db and follow this user's own posts
+	@return DB insert return
 	-------------------------------------------------------------------------------------------------*/
 	public function add_new_user ($user_data) {
 	
@@ -32,6 +38,7 @@ class WhatsUpUser extends User {
 	
 	/*-------------------------------------------------------------------------------------------------
 	Get all of the posts for the users this user is following, including their own
+	@return Array of posts
 	-------------------------------------------------------------------------------------------------*/
 	public function get_followed_posts ($user_id) {
 
@@ -61,6 +68,7 @@ class WhatsUpUser extends User {
 	
 	/*-------------------------------------------------------------------------------------------------
 	Insert a new post into the posts table
+	@return DB insert return
 	-------------------------------------------------------------------------------------------------*/
 	public function add_post ($user_id, $post_data) {
 	
@@ -79,9 +87,11 @@ class WhatsUpUser extends User {
 	
 	/*-------------------------------------------------------------------------------------------------
 	Remove a post from the posts table
+	@return DB delete return
 	-------------------------------------------------------------------------------------------------*/
 	public function delete_post ($user_id, $post_id) {
 	
+		# Delete the post from the posts table
 		$where_condition = 'WHERE post_id = '.$post_id;
 		return DB::instance(DB_NAME)->delete('posts', $where_condition);
 	
@@ -89,6 +99,7 @@ class WhatsUpUser extends User {
 	
 	/*-------------------------------------------------------------------------------------------------
 	Get a list of users other than this one
+	@return Array containing all other users
 	-------------------------------------------------------------------------------------------------*/
 	public function get_all_other_users ($user_id) {
 	
@@ -108,6 +119,7 @@ class WhatsUpUser extends User {
 	
 	/*-------------------------------------------------------------------------------------------------
 	Get a list of users being followed
+	@return Array containing followed users
 	-------------------------------------------------------------------------------------------------*/
 	public function get_followed_users ($user_id) {
 	
@@ -129,6 +141,7 @@ class WhatsUpUser extends User {
 	
 	/*-------------------------------------------------------------------------------------------------
 	Follow a user
+	@return DB insert return
 	-------------------------------------------------------------------------------------------------*/
 	public function follow_user ($user_id, $user_id_followed) {
 	
@@ -146,6 +159,7 @@ class WhatsUpUser extends User {
 	
 	/*-------------------------------------------------------------------------------------------------
 	Stop following a user
+	@return DB delete return
 	-------------------------------------------------------------------------------------------------*/
 	public function unfollow_user ($user_id, $user_id_followed) {
 	
@@ -159,6 +173,7 @@ class WhatsUpUser extends User {
 	
 	/*-------------------------------------------------------------------------------------------------
 	Validates an email address for format and uniqueness
+	@return Any error message text, or empty string
 	-------------------------------------------------------------------------------------------------*/
 	public function validate_email ($email, $check_unique = TRUE) {
 	
@@ -179,6 +194,7 @@ class WhatsUpUser extends User {
 
 	/*-------------------------------------------------------------------------------------------------
 	Check for invalid characters
+	@return true if invalid characters found, or false if none found
 	-------------------------------------------------------------------------------------------------*/
 	public function check_for_invalid_chars ($data) {
 	
@@ -193,19 +209,13 @@ class WhatsUpUser extends User {
 	}	
 	
 	/*-------------------------------------------------------------------------------------------------
-	Sanitize user data
+	Cleanse user data - convert to HTML entities and strip slashes
+	@return cleansed string
 	-------------------------------------------------------------------------------------------------*/
-	public function sanitize_data ($data) {
-	/*
-		echo "$data = '".$data."' <br>";
-		echo "nl2br = '".nl2br($data)."' <br>";
-		echo "stripslashes = '".stripslashes(nl2br($data))."' <br>";
-		echo "htmlentities = '".htmlentities(stripslashes(nl2br($data)),ENT_QUOTES,"Utf-8")."' <br>";
-		echo "DB sanitize = '".DB::instance(DB_NAME)->sanitize(
-					htmlentities(stripslashes(nl2br($data)),ENT_QUOTES,"Utf-8"))."' <br>";
-	*/
-		return DB::instance(DB_NAME)->sanitize(
-					htmlentities(stripslashes(nl2br($data)),ENT_QUOTES,"Utf-8"));
+	public function cleanse_data ($data) {
+	
+		return htmlentities(stripslashes(nl2br($data)),ENT_QUOTES,"Utf-8");
+					
 	}
 
 } #eof

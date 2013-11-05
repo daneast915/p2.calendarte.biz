@@ -21,7 +21,7 @@
 				value='<?=$last_name?>' />
 		<br><br>
 
-		<label for='email'>Email</label>
+		<label for='email'>Email Address</label>
 		<input type='text' name='email' id='email' class='textbox'
 				value='<?=$email?>' />
 		<br><br>

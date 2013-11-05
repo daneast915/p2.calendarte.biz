@@ -20,9 +20,9 @@ class users_controller extends base_controller {
 	-------------------------------------------------------------------------------------------------*/
     public function index() {
     
-    	# If user is blank, they're not logged in; redirect them to the Login page
+    	# If user is blank, they're not logged in; redirect them to the Main page
     	if (!$this->user)
-    		Router::redirect('/users/login');
+    		Router::redirect('/');
 		else
     		Router::redirect("/posts/index");	
 	}
@@ -46,6 +46,9 @@ class users_controller extends base_controller {
         	echo $this->template;
 			return;
     	}
+		
+ 		# Prevent SQL injection attacks by sanitizing the data the user entered in the form
+		$_POST = DB::instance(DB_NAME)->sanitize($_POST);
 
 		# Innocent until proven guilty
 		$error = false;
@@ -55,7 +58,7 @@ class users_controller extends base_controller {
 		$field_names = Array(
 			"first_name" => "First Name",
 			"last_name" => "Last Name",
-			"email" => "Email",
+			"email" => "Email Address",
 			"password" => "Password"
 			);
 		
@@ -76,9 +79,9 @@ class users_controller extends base_controller {
 		}
 		
 		# Sanitize the data
-		$_POST['first_name'] = $this->userObj->sanitize_data ($_POST['first_name']);
-		$_POST['last_name'] = $this->userObj->sanitize_data ($_POST['last_name']);
-		$_POST['email'] = $this->userObj->sanitize_data ($_POST['email']);
+		$_POST['first_name'] = $this->userObj->cleanse_data ($_POST['first_name']);
+		$_POST['last_name'] = $this->userObj->cleanse_data ($_POST['last_name']);
+		$_POST['email'] = $this->userObj->cleanse_data ($_POST['email']);
 		
 		$email = $_POST['email'];
 		
@@ -146,6 +149,9 @@ class users_controller extends base_controller {
 			echo $this->template;
 			return;
 		}
+		
+ 		# Prevent SQL injection attacks by sanitizing the data the user entered in the form
+		$_POST = DB::instance(DB_NAME)->sanitize($_POST);
 
 		# Attempt to login
 		$token = $this->userObj->login ($_POST['email'], $_POST['password']);
@@ -212,7 +218,6 @@ class users_controller extends base_controller {
 		$content->last_name = $this->user->last_name;
 		$content->email = $this->user->email;
 		
-		//echo $content;
 		$this->template->content = $content;
 		$this->template->title = 'Edit Profile';
 	
@@ -220,6 +225,9 @@ class users_controller extends base_controller {
 			echo $this->template;
 			return;
 		}
+		
+ 		# Prevent SQL injection attacks by sanitizing the data the user entered in the form
+		$_POST = DB::instance(DB_NAME)->sanitize($_POST);
 		
 		# Innocent until proven guilty
 		$error = false;
@@ -229,7 +237,7 @@ class users_controller extends base_controller {
 		$field_names = Array(
 			"first_name" => "First Name",
 			"last_name" => "Last Name",
-			"email" => "Email"
+			"email" => "Email Address"
 			);
 					
 		# Loop through the POST data to validate
@@ -248,9 +256,9 @@ class users_controller extends base_controller {
 		}
 		
 		# Sanitize the fields
-		$_POST['first_name'] = $this->userObj->sanitize_data ($_POST['first_name']);
-		$_POST['last_name'] = $this->userObj->sanitize_data ($_POST['last_name']);
-		$_POST['email'] = $this->userObj->sanitize_data ($_POST['email']);
+		$_POST['first_name'] = $this->userObj->cleanse_data ($_POST['first_name']);
+		$_POST['last_name'] = $this->userObj->cleanse_data ($_POST['last_name']);
+		$_POST['email'] = $this->userObj->cleanse_data ($_POST['email']);
 		
 		$email = $_POST['email'];
 
@@ -272,7 +280,6 @@ class users_controller extends base_controller {
 
 		# If any errors, display the page with the errors
 		if ($error) {
-		echo print_r($_POST);
 			$this->template->content->first_name = $_POST['first_name'];
 			$this->template->content->last_name = $_POST['last_name'];
 			$this->template->content->email = $email;

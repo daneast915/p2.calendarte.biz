@@ -10,6 +10,7 @@ header {
 	background-color: Maroon;
 	margin: -0.5em;
 	text-align: center;
+	padding: .5em;
 }
 
 header img {
@@ -25,6 +26,11 @@ header h1 {
 	display: inline;
 	margin: 1em;
 	vertical-align: middle;
+}
+
+header a.header_link {
+	color: white;
+	text-decoration: none;
 }
 
 footer {
@@ -47,10 +53,16 @@ footer {
 	margin-top: 2em;
 }
 
+.welcome-text {
+	font-size: larger;
+	margin-bottom: 1em;
+}
+
 h2 {
 	color: Black;
-	margin: 1em;
+	margin: .5em;
 	margin-left: 3em;
+	margin-bottom: 1em;
 	text-align: left;
 	text-shadow: 2px 2px 2px #999;
 }

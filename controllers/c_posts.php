@@ -14,8 +14,9 @@ class posts_controller extends base_controller {
 
 		# careful with echos here!
 
+		# Not logged in - redirect to the Main page
     	if (!$this->user)
-    		Router::redirect('/users/login');
+    		Router::redirect('/');
 	}
 	
 	/*-------------------------------------------------------------------------------------------------
@@ -62,15 +63,13 @@ class posts_controller extends base_controller {
 		# Innocent until proven guilty
 		$error = false;
 		$this->template->content->error = '';
-	
+		
+ 		# Prevent SQL injection attacks by sanitizing the data the user entered in the form
+		$_POST = DB::instance(DB_NAME)->sanitize($_POST);
+			
 		# Validate the post
 		if (empty($_POST['content'])) {
 			$this->template->content->error .= 'Post must not be empty.<br/>';
-			$error = true;
-		}
-
-		if ($this->userObj->check_for_invalid_chars ($_POST['content']))  {
-			$this->template->content->error .= 'Post contains invalid characters.<br/>';
 			$error = true;
 		}
 
@@ -81,7 +80,7 @@ class posts_controller extends base_controller {
 		}
 
 		# Add a post for this user
-		$_POST['content'] = $this->userObj->sanitize_data ($_POST['content']);
+		$_POST['content'] = $this->userObj->cleanse_data ($_POST['content']);
 		$this->userObj->add_post ($this->user->user_id, $_POST);
 		
 		# Feedback

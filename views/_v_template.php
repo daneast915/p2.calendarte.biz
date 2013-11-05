@@ -12,7 +12,11 @@
 
 <body>	
 	<header>
-    	<h1><?=APP_NAME?></h1>
+    	<h1>
+    		<a class="header_link" title="<?=APP_NAME?>" href="/">
+    			<?=APP_NAME?>
+    		</a>
+    	</h1>
 	</header>
 
     <?php if ($user): ?>

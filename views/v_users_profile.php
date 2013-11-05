@@ -10,11 +10,11 @@
     <div id='last_name'><?=$user->last_name?></div>
     <br/>
 
-    <label for='email'>Email</label>
+    <label for='email'>Email Address</label>
     <div id='email'><?=$user->email?></div>
     <br/>
     
-    <hr/>
+    <hr class='hr-thin'/>
 
     <p class='alternative'>
     <a href="/users/profileedit">Edit Profile</a>
