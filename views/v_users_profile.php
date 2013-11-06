@@ -1,6 +1,13 @@
 <h2>Profile for <?=$user->first_name?></h2>
 
 <section id="users_profile">
+	
+	<?php if (isset($message)): ?>
+		<div class='message'>
+			<?=$message?>
+		</div>
+		<br/>
+	<?php endif; ?>
 
     <label for='first_name'>First Name</label>
     <div id='first_name'><?=$user->first_name?></div>

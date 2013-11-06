@@ -1,7 +1,7 @@
 <?php
 
-ini_set('display_errors', 'On');
-error_reporting(E_ALL);
+// ini_set('display_errors', 'On');
+// error_reporting(E_ALL);
 
 class users_controller extends base_controller {
 
@@ -133,6 +133,7 @@ class users_controller extends base_controller {
 		$this->template->content = View::instance('v_users_login');
 		$this->template->title   = "Log In";
 		
+		# Set message based on the $param
 		if (isset($param)) {
 			switch ($param) {
 				case 1:
@@ -158,7 +159,7 @@ class users_controller extends base_controller {
     	
     	if (!$token) {
     		# Send them back to the login page
-			$this->template->content->error = "Login failed. Invalid Email or Password.<br/>";
+			$this->template->content->error = "Login failed. Invalid Email Address or Password.<br/>";
 			echo $this->template;
 			return;
     	} 
@@ -186,20 +187,25 @@ class users_controller extends base_controller {
 	/*-------------------------------------------------------------------------------------------------
 	users/profile controller method
 	-------------------------------------------------------------------------------------------------*/
-    public function profile($user_name = NULL) { 
+    public function profile($param = NULL) { 
     
     	# If user is blank, they're not logged in; redirect them to the Login page
     	if (!$this->user)
     		Router::redirect('/users/login');
 
 		# Setup view
-		$content = View::instance('v_users_profile');
-		$content->user_name = $user_name;
-
-		//echo $content;
-		$this->template->content = $content;
+		$this->template->content = View::instance('v_users_profile');
 		$this->template->title = 'Profile';
 		
+		# Set message based on the $param
+		if (isset($param)) {
+			switch ($param) {
+				case 1:
+					$this->template->content->message = "Your profile was updated.<br/>";
+					break;
+			}
+		}
+				
 		echo $this->template;
     }
 
@@ -297,7 +303,7 @@ class users_controller extends base_controller {
 		$this->userObj->update_profile ($this->user->token, $_POST);
 		   
 		# Send them back to the profile page.
-		Router::redirect("/users/profile");
+		Router::redirect("/users/profile/1");
    	}
 
 } # end of the class

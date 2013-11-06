@@ -14,7 +14,7 @@
 	<header>
     	<h1>
     		<a class="header_link" title="<?=APP_NAME?>" href="/">
-    			<?=APP_NAME?>
+    			"<?=APP_NAME?>"
     		</a>
     	</h1>
 	</header>
@@ -34,7 +34,7 @@
 			<li><a href='/'>Home</a></li>
 		
             <li><a href='/posts/add'>Add Post</a></li>
-            <li><a href='/posts/index'>List Posts</a></li>
+            <li><a href='/posts/index'>See Posts</a></li>
             <li><a href='/posts/users'>Follow Users</a></li>
         </ul>
         
@@ -49,7 +49,9 @@
 	
 	<footer>
 		<hr class='hr-thin'/>
-		What's Up? -- Project 2, DWA15, Dan East
+		"What's Up?" -- Project 2, Dan East
+		<br/>
+		CSCI E15 - Dynamic Web Applications
 		<br/>
 		Harvard University Extension School
 	</footer>

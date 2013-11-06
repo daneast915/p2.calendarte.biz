@@ -1,7 +1,14 @@
 <h2>Follow Users</h2>
 
 <section id="users-list">
-
+	
+	<?php if (isset($message)): ?>
+		<div class='message'>
+			<?=$message?>
+		</div>
+		<br/>
+	<?php endif; ?>
+		
 	<?php foreach ($users as $user): ?>
 
 	<article class="user">

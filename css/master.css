@@ -1,4 +1,4 @@
-/* CSS File for you to author for Assignment 2 Part 2 */
+/* CSS File for Project 2, CSCI E15 - Dynamic Web Applications, Dan East */
 
 body {
 	background-color: #FBFBFB;
@@ -49,10 +49,6 @@ footer {
     padding: 0;
 }
 
-.site_navigation {
-	margin-top: 2em;
-}
-
 .welcome-text {
 	font-size: larger;
 	margin-bottom: 1em;
@@ -67,15 +63,19 @@ h2 {
 	text-shadow: 2px 2px 2px #999;
 }
 
+#users-list,
+#posts-list {
+	width: 50em;
+	margin-left: auto;
+	margin-right: auto;
+}
+
 article {
 	background-color: #F0F0F0;
 	border-color: #bbb;
 	border-radius: 5px;
 	border-width: 1px;
 	border-style: solid;
-	width: 50em;
-	margin-left: auto;
-	margin-right: auto;
 	margin-top: .8em;
 	padding: .5em;
 }
@@ -133,12 +133,12 @@ a:active {
 	color: Gray;
 }	
 
-
 .site_navigation {
 	font-size: 90%;
 	font-weight: bold;
 	padding-bottom: 0.1em;
 	border-bottom: 0.5em solid Maroon;
+	margin-top: 2em;
 }
 
 /* iPad (portrait + landscape) */
@@ -288,9 +288,10 @@ label {
 	border-radius: 4px;
 	background-color: Maroon;
 	color: White;
-	padding: .4em;
+	padding: .35em;
 	font-size: larger;
 	margin-top: .2em;
+	cursor: pointer;
 }
 
 .textbox {
@@ -341,7 +342,9 @@ label {
 .listentry-button {
 	border: 1px solid black;
 	border-radius: 3px;
-	background-color: Gray;
+	background-color: Maroon;
 	color: White;
 	padding: .3em;
+	cursor: pointer;
+	font-size: small;
 } 

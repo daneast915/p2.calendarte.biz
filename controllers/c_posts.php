@@ -1,7 +1,7 @@
 <?php
 
-ini_set('display_errors', 'On');
-error_reporting(E_ALL);
+// ini_set('display_errors', 'On');
+// error_reporting(E_ALL);
 
 class posts_controller extends base_controller {
 
@@ -22,18 +22,30 @@ class posts_controller extends base_controller {
 	/*-------------------------------------------------------------------------------------------------
 	
 	-------------------------------------------------------------------------------------------------*/
-	public function index() {
+	public function index($param = NULL) {
 	
 		# Setup the View
 		$this->template->content = View::instance('v_posts_index');
 		$this->template->title = "Posts";
 		
+		# Set message based on the $param
+		if (isset($param)) {
+			switch ($param) {
+				case 1:
+					$this->template->content->message = "Your new post was added.<br/>";
+					break;
+				case 2:
+					$this->template->content->message = "Your post was deleted.<br/>";
+					break;
+			}
+		}
+				
 		# Get the posts of the followed users
 		$posts = $this->userObj->get_followed_posts ($this->user->user_id);
 		
 		if (count($posts) == 0) {
 			# Let them follow some users
-			Router::redirect("/posts/users");
+			Router::redirect("/posts/users/1");
 		}
 		
 		# Pass data to the View
@@ -84,7 +96,7 @@ class posts_controller extends base_controller {
 		$this->userObj->add_post ($this->user->user_id, $_POST);
 		
 		# Feedback
-		Router::redirect("/posts/index");
+		Router::redirect("/posts/index/1");
 	}
 	
 	/*-------------------------------------------------------------------------------------------------
@@ -96,18 +108,27 @@ class posts_controller extends base_controller {
 		$this->userObj->delete_post ($this->user->user_id, $_POST['post_id']);
 			
 		# Send them back
-		Router::redirect("/posts/index");	
+		Router::redirect("/posts/index/2");	
 	}
 	
 	/*-------------------------------------------------------------------------------------------------
 	
 	-------------------------------------------------------------------------------------------------*/
-	public function users() {
+	public function users($param = NULL) {
 	
 		# Setup the View
 		$this->template->content = View::instance("v_posts_users");
 		$this->template->title = "Users";
 		
+		# Set message based on the $param
+		if (isset($param)) {
+			switch ($param) {
+				case 1:
+					$this->template->content->message = "Follow some users to see their posts.<br/>";
+					break;
+			}
+		}
+				
 		# Get a list of all other users
 		$users = $this->userObj->get_all_other_users ($this->user->user_id);
 		

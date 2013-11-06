@@ -1,4 +1,4 @@
-<h2>Sign Up for <?=APP_NAME?></h2>
+<h2>Sign Up for "<?=APP_NAME?>"</h2>
 
 <section id="users_signup">
 
@@ -21,7 +21,7 @@
 				value='<?=$last_name?>' /> 
 		<br/><br/>
 
-		<label for='email'>Email</label>
+		<label for='email'>Email Address</label>
 		<input type='text' name='email' id='email' class='textbox'
 				value='<?=$email?>' /> 
 		<br/><br/>

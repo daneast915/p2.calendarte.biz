@@ -8,16 +8,21 @@ class WhatsUpUser extends User {
 
 	/*-------------------------------------------------------------------------------------------------
 	Update the profile of a user
+	
+	@param  $token     - the user's token
+	@param  $user_data - array of data to be used in the user's profile update
 	@return DB update return
 	-------------------------------------------------------------------------------------------------*/
-	public function update_profile ($token, $data /* array */ ) {
+	public function update_profile ($token, $user_data /* array */ ) {
 	
-		return DB::instance(DB_NAME)->update("users", $data, "WHERE token = '".$token."'");
+		return DB::instance(DB_NAME)->update("users", $user_data, "WHERE token = '".$token."'");
 		
 	}
 	
 	/*-------------------------------------------------------------------------------------------------
 	Insert a new user into the db and follow this user's own posts
+	
+	@param  $user_data - array of data to be used in the new user profile
 	@return DB insert return
 	-------------------------------------------------------------------------------------------------*/
 	public function add_new_user ($user_data) {
@@ -38,6 +43,8 @@ class WhatsUpUser extends User {
 	
 	/*-------------------------------------------------------------------------------------------------
 	Get all of the posts for the users this user is following, including their own
+
+	@param  $user_id - id of the user
 	@return Array of posts
 	-------------------------------------------------------------------------------------------------*/
 	public function get_followed_posts ($user_id) {
@@ -68,6 +75,9 @@ class WhatsUpUser extends User {
 	
 	/*-------------------------------------------------------------------------------------------------
 	Insert a new post into the posts table
+
+	@param  $user_id   - id of the user
+	@param  $post_data - array of data for the new post
 	@return DB insert return
 	-------------------------------------------------------------------------------------------------*/
 	public function add_post ($user_id, $post_data) {
@@ -87,6 +97,9 @@ class WhatsUpUser extends User {
 	
 	/*-------------------------------------------------------------------------------------------------
 	Remove a post from the posts table
+
+	@param  $user_id - id of the user
+	@param  $post_id - id of the post to delete
 	@return DB delete return
 	-------------------------------------------------------------------------------------------------*/
 	public function delete_post ($user_id, $post_id) {
@@ -99,6 +112,8 @@ class WhatsUpUser extends User {
 	
 	/*-------------------------------------------------------------------------------------------------
 	Get a list of users other than this one
+
+	@param  $user_id - id of the user
 	@return Array containing all other users
 	-------------------------------------------------------------------------------------------------*/
 	public function get_all_other_users ($user_id) {
@@ -119,6 +134,8 @@ class WhatsUpUser extends User {
 	
 	/*-------------------------------------------------------------------------------------------------
 	Get a list of users being followed
+
+	@param  $user_id - id of the user
 	@return Array containing followed users
 	-------------------------------------------------------------------------------------------------*/
 	public function get_followed_users ($user_id) {
@@ -141,6 +158,9 @@ class WhatsUpUser extends User {
 	
 	/*-------------------------------------------------------------------------------------------------
 	Follow a user
+
+	@param  $user_id         - id of the user that is following
+	@param  $user_id_followd - id of the user to be followed
 	@return DB insert return
 	-------------------------------------------------------------------------------------------------*/
 	public function follow_user ($user_id, $user_id_followed) {
@@ -159,6 +179,9 @@ class WhatsUpUser extends User {
 	
 	/*-------------------------------------------------------------------------------------------------
 	Stop following a user
+
+	@param  $user_id         - id of the user that is following
+	@param  $user_id_followd - id of the user to stop following	
 	@return DB delete return
 	-------------------------------------------------------------------------------------------------*/
 	public function unfollow_user ($user_id, $user_id_followed) {
@@ -173,6 +196,9 @@ class WhatsUpUser extends User {
 	
 	/*-------------------------------------------------------------------------------------------------
 	Validates an email address for format and uniqueness
+	
+	@param  $email        - the email address to validate
+	@param  $check_unique - bool, whether or not to check for uniqueness
 	@return Any error message text, or empty string
 	-------------------------------------------------------------------------------------------------*/
 	public function validate_email ($email, $check_unique = TRUE) {
@@ -194,6 +220,8 @@ class WhatsUpUser extends User {
 
 	/*-------------------------------------------------------------------------------------------------
 	Check for invalid characters
+	
+	@param  $data - string data to check for invalid characters
 	@return true if invalid characters found, or false if none found
 	-------------------------------------------------------------------------------------------------*/
 	public function check_for_invalid_chars ($data) {
@@ -210,6 +238,8 @@ class WhatsUpUser extends User {
 	
 	/*-------------------------------------------------------------------------------------------------
 	Cleanse user data - convert to HTML entities and strip slashes
+	
+	@param  $data - string data to be cleansed
 	@return cleansed string
 	-------------------------------------------------------------------------------------------------*/
 	public function cleanse_data ($data) {

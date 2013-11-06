@@ -1,4 +1,4 @@
-<h2>Log in to <?=APP_NAME?></h2>
+<h2>Log in to "<?=APP_NAME?>"</h2>
 
 <section id="users_login">
 

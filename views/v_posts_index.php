@@ -1,6 +1,13 @@
 <h2>Posts</h2>
 
-<section id="posts_list">
+<section id="posts-list">
+
+	<?php if (isset($message)): ?>
+		<div class='message'>
+			<?=$message?>
+		</div>
+		<br/>
+	<?php endif; ?>
 
 	<?php foreach ($posts as $post): 
 		$canDelete = ($post['post_user_id'] == $user_id);

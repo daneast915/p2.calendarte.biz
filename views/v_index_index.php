@@ -1,4 +1,4 @@
-<h2>Welcome to <?=APP_NAME?></h2>
+<h2>Welcome to "<?=APP_NAME?>"</h2>
 
 <section id="welcome">
 	<p class='welcome-text'>
